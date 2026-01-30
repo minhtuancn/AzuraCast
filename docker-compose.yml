@@ -4,45 +4,32 @@ services:
     image: ghcr.io/azuracast/azuracast:${AZURACAST_VERSION:-stable}
 
     labels:
-      - com.centurylinklabs.watchtower.scope=azuracast
+      - "traefik.enable=true"
+      - "traefik.http.routers.azuracast.rule=Host(`radio.go7s.net`)"
+      - "traefik.http.routers.azuracast.entrypoints=web"
+      - "traefik.http.services.azuracast.loadbalancer.server.port=80"
 
     ports:
-      # 🔑 Port nội bộ cho Coolify proxy (KHÔNG public)
+      # nội bộ để debug (không bắt buộc, có thể bỏ sau)
       - "127.0.0.1:8088:80"
 
-      # 🎧 Stream ports (3 stations)
+      # stream
       - "8000:8000"
       - "8001:8001"
       - "8002:8002"
 
-      # 📁 SFTP (giữ nếu dùng upload)
+      # sftp
       - "2022:2022"
-
-    # ❌ KHÔNG dùng env_file trong Coolify
-    # env_file:
-    #   - azuracast.env
-    #   - .env
 
     volumes:
       - station_data:/var/azuracast/stations
       - backups:/var/azuracast/backups
       - db_data:/var/lib/mysql
-
       - www_uploads:/var/azuracast/storage/uploads
       - geolite_install:/var/azuracast/storage/geoip
       - sftpgo_data:/var/azuracast/storage/sftpgo
 
     restart: unless-stopped
-
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
-
-    logging:
-      options:
-        max-size: "1m"
-        max-file: "5"
 
 volumes:
   db_data: {}
