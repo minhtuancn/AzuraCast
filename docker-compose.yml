@@ -5,7 +5,7 @@ services:
 
     ports:
       # Web AzuraCast (NPM sẽ forward vào đây)
-      - "127.0.0.1:8088:80"
+      - "8088:80"
 
       # Stream ports (3 station)
       - "8000:8000"
