@@ -11,6 +11,7 @@ services:
     # ❌ KHÔNG expose web port (Coolify proxy)
     # ❌ KHÔNG expose HTTPS nội bộ
     ports:
+     - "127.0.0.1:8088:80"
       # ✅ CHỈ expose port stream cho 3 station
       - "8000:8000"
       - "8001:8001"
