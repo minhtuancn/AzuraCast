@@ -1,0 +1,68 @@
+name: azuracast
+
+services:
+  web:
+    container_name: azuracast
+    image: ghcr.io/azuracast/azuracast:${AZURACAST_VERSION:-stable}
+
+    labels:
+      - com.centurylinklabs.watchtower.scope=azuracast
+
+    # ❌ KHÔNG expose web port (Coolify proxy)
+    # ❌ KHÔNG expose HTTPS nội bộ
+    ports:
+      # ✅ CHỈ expose port stream cho 3 station
+      - "8000:8000"
+      - "8001:8001"
+      - "8002:8002"
+      # ⚠️ SFTP chỉ giữ nếu bạn CẦN upload qua SFTP
+      - "2022:2022"
+
+    env_file:
+      - azuracast.env
+      - .env
+
+    volumes:
+      # ✅ BẮT BUỘC
+      - station_data:/var/azuracast/stations
+      - backups:/var/azuracast/backups
+      - db_data:/var/lib/mysql
+
+      # ✅ GIỮ (nhẹ, cần thiết)
+      - www_uploads:/var/azuracast/storage/uploads
+      - geolite_install:/var/azuracast/storage/geoip
+      - sftpgo_data:/var/azuracast/storage/sftpgo
+
+      # ❌ BỎ (nặng, không cần nếu không dùng)
+      # - shoutcast2_install:/var/azuracast/storage/shoutcast2
+      # - stereo_tool_install:/var/azuracast/storage/stereo_tool
+      # - rsas_install:/var/azuracast/storage/rsas
+      # - acme:/var/azuracast/storage/acme
+
+    restart: unless-stopped
+
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "5"
+
+  # ❌ TẮT updater (Coolify đã quản lý lifecycle)
+  # updater:
+  #   container_name: azuracast_updater
+  #   image: ghcr.io/azuracast/updater:latest
+  #   restart: unless-stopped
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  db_data: {}
+  station_data: {}
+  backups: {}
+  www_uploads: {}
+  geolite_install: {}
+  sftpgo_data: {}
