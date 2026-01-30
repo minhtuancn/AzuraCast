@@ -1,18 +1,24 @@
 services:
   web:
-    image: ghcr.io/azuracast/azuracast:stable
     container_name: azuracast
+    image: ghcr.io/azuracast/azuracast:${AZURACAST_VERSION:-stable}
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.azuracast.rule=Host(`radio.go7s.net`)"
+      - "traefik.http.routers.azuracast.entrypoints=web"
+      - "traefik.http.services.azuracast.loadbalancer.server.port=80"
 
     ports:
-      # Web AzuraCast (NPM sẽ forward vào đây)
+      # nội bộ để debug (không bắt buộc, có thể bỏ sau)
       - "127.0.0.1:8088:80"
 
-      # Stream ports (3 station)
+      # stream
       - "8000:8000"
       - "8001:8001"
       - "8002:8002"
 
-      # SFTP upload
+      # sftp
       - "2022:2022"
 
     volumes:
@@ -26,9 +32,9 @@ services:
     restart: unless-stopped
 
 volumes:
+  db_data: {}
   station_data: {}
   backups: {}
-  db_data: {}
   www_uploads: {}
   geolite_install: {}
   sftpgo_data: {}
