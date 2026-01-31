@@ -7,10 +7,8 @@ services:
       # Web AzuraCast (NPM sẽ forward vào đây)
       - "8088:80"
 
-      # Stream ports (3 station)
-      - "8000:8000"
-      - "8001:8001"
-      - "8002:8002"
+
+  - "8000-8500:8000-8500"
 
       # SFTP upload
       - "2022:2022"
